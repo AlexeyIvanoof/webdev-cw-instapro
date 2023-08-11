@@ -1,6 +1,7 @@
-import { getPosts } from "./api.js";
+import { getPosts, getUserPosts} from "./api.js";
 import { renderAddPostPageComponent } from "./components/add-post-page-component.js";
 import { renderAuthPageComponent } from "./components/auth-page-component.js";
+import { renderPostsSpecificUser } from "./components/post -user.js";
 import {
   ADD_POSTS_PAGE,
   AUTH_PAGE,
@@ -65,22 +66,42 @@ export const goToPage = (newPage, data) => {
           goToPage(POSTS_PAGE);
         });
     }
+// изменения !!!
+if (newPage === USER_POSTS_PAGE) {
+  page = LOADING_PAGE;
+  renderApp();
 
-    if (newPage === USER_POSTS_PAGE) {
-      // TODO: реализовать получение постов юзера из API
-      console.log("Открываю страницу пользователя: ", data.userId);
+  const id = data.userId;
+
+  getUserPosts({
+    token: getToken(),
+    id,
+  })
+    .then((newPosts) => {
       page = USER_POSTS_PAGE;
-      posts = [];
-      return renderApp();
-    }
+      posts = newPosts;
+      renderApp();
+    })
+    .catch((error) => {
+      console.error(error);
+      goToPage(USER_POSTS_PAGE);
+    });
 
-    page = newPage;
-    renderApp();
 
-    return;
-  }
+  // TODO: реализовать получение постов юзера из API
+  console.log("Открываю страницу пользователя: ", data.userId);
+  // posts = [];
 
-  throw new Error("страницы не существует");
+  return renderApp();
+}
+
+page = newPage;
+renderApp();
+
+return;
+}
+
+throw new Error("страницы не существует");
 };
 
 const renderApp = () => {
@@ -110,7 +131,7 @@ const renderApp = () => {
     return renderAddPostPageComponent({
       appEl,
       token: getToken(),
-      addPost({ description, imageUrl, token }) {
+      onAddPostClick({ description, imageUrl }) {
         // TODO: реализовать добавление поста в API
         console.log("Добавляю пост...", { description, imageUrl, token });
         goToPage(POSTS_PAGE);
@@ -121,14 +142,18 @@ const renderApp = () => {
   if (page === POSTS_PAGE) {
     return renderPostsPageComponent({
       appEl,
+      token: getToken()
     });
   }
 
   if (page === USER_POSTS_PAGE) {
     // TODO: реализовать страницу фотографию пользвателя
-    appEl.innerHTML = "Здесь будет страница фотографий пользователя";
-    return;
+    return renderPostsSpecificUser({
+      appEl,
+      token: getToken()
+    });
   }
+
 };
 
 goToPage(POSTS_PAGE);

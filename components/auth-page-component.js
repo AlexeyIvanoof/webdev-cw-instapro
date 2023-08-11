@@ -2,6 +2,7 @@ import { loginUser, registerUser } from "../api.js";
 import { renderHeaderComponent } from "./header-component.js";
 import { renderUploadImageComponent } from "./upload-image-component.js";
 
+// рендер функции страница авторизации
 export function renderAuthPageComponent({ appEl, setUser }) {
   let isLoginMode = true;
   let imageUrl = "";
@@ -71,6 +72,7 @@ export function renderAuthPageComponent({ appEl, setUser }) {
         element: appEl.querySelector(".upload-image-container"),
         onImageUrlChange(newImageUrl) {
           imageUrl = newImageUrl;
+          console.log(newImageUrl);
         },
       });
     }
@@ -93,8 +95,18 @@ export function renderAuthPageComponent({ appEl, setUser }) {
         }
 
         loginUser({
-          login: login,
-          password: password,
+          login: login
+          .replace('<', '&lt;')
+          .replace('>', '&gt;')
+          .replace('"', '&quot;')
+          .replace('&', '&amp;')
+          .replace('`', '&lsquo;'),
+          password: password
+          .replace('<', '&lt;')
+          .replace('>', '&gt;')
+          .replace('"', '&quot;')
+          .replace('&', '&amp;')
+          .replace('`', '&lsquo;'),
         })
           .then((user) => {
             setUser(user.user);
@@ -127,9 +139,24 @@ export function renderAuthPageComponent({ appEl, setUser }) {
         }
 
         registerUser({
-          login: login,
-          password: password,
-          name: name,
+          login: login
+          .replace('<', '&lt;')
+          .replace('>', '&gt;')
+          .replace('"', '&quot;')
+          .replace('&', '&amp;')
+          .replace('`', '&lsquo;'),
+          password: password
+          .replace('<', '&lt;')
+          .replace('>', '&gt;')
+          .replace('"', '&quot;')
+          .replace('&', '&amp;')
+          .replace('`', '&lsquo;'),
+          name: name
+          .replace('<', '&lt;')
+          .replace('>', '&gt;')
+          .replace('"', '&quot;')
+          .replace('&', '&amp;')
+          .replace('`', '&lsquo;'),
           imageUrl,
         })
           .then((user) => {
